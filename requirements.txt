@@ -1,0 +1,12 @@
+# Data, baselines, evaluation
+pandas>=2.0
+pyarrow>=14
+numpy>=1.26
+scikit-learn>=1.4
+matplotlib>=3.8
+joblib>=1.3
+# Neural models (BiLSTM, Word2Vec, Transformers)
+torch>=2.2
+transformers>=4.44
+peft>=0.12
+sentencepiece>=0.2
