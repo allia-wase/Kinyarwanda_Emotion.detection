@@ -54,6 +54,9 @@ def load_model(cfg):
     model = AutoModelForSequenceClassification.from_pretrained(
         cfg["model"], num_labels=len(EMOTIONS), problem_type="multi_label_classification",
         id2label=dict(enumerate(EMOTIONS)), label2id={e: i for i, e in enumerate(EMOTIONS)})
+    # AfroXLMR-large is stored in fp16 and recent transformers keep that dtype; mixed
+    # precision needs fp32 master weights (fp16 is used only inside autocast).
+    model = model.float()
     if cfg.get("lora"):
         from peft import LoraConfig, get_peft_model
         try:  # Colab ships torchao 0.10; peft >= 0.18 raises on it even though LoRA never uses it
