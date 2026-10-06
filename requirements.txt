@@ -10,3 +10,4 @@ torch>=2.2
 transformers>=4.44
 peft>=0.12
 sentencepiece>=0.2
+protobuf>=4  # needed to convert AfriBERTa's SentencePiece tokenizer
