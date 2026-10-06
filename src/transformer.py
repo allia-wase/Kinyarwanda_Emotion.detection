@@ -56,6 +56,11 @@ def load_model(cfg):
         id2label=dict(enumerate(EMOTIONS)), label2id={e: i for i, e in enumerate(EMOTIONS)})
     if cfg.get("lora"):
         from peft import LoraConfig, get_peft_model
+        try:  # Colab ships torchao 0.10; peft >= 0.18 raises on it even though LoRA never uses it
+            import peft.tuners.lora.torchao as peft_torchao
+            peft_torchao.is_torchao_available = lambda: False
+        except ImportError:
+            pass
         model = get_peft_model(model, LoraConfig(
             task_type="SEQ_CLS", r=16, lora_alpha=32, lora_dropout=0.1,
             target_modules=["query", "value"]))  # classifier head stays fully trainable
