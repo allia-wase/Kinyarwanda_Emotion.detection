@@ -1,0 +1,12 @@
+{
+  "experiments": [
+    "B4_word+char_tfidf_logreg_tuned",
+    "L3_bilstm_w2v_finetuned_maxpool",
+    "T1_xlmr_base",
+    "T2_afriberta_large",
+    "T3_afroxlmr_base",
+    "T4_afroxlmr_large"
+  ],
+  "hard_cases_wrong_for_all": 268,
+  "test_size": 1231
+}

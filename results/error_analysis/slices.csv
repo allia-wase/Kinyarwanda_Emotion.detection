@@ -1,0 +1,9 @@
+slice,n_texts,B4_word+char_tfidf_logreg_tuned,L3_bilstm_w2v_finetuned_maxpool,T1_xlmr_base,T2_afriberta_large,T3_afroxlmr_base,T4_afroxlmr_large
+tweet (has @mention),371,0.293,0.314,0.21,0.301,0.358,0.393
+no @mention (news-style),860,0.481,0.446,0.324,0.501,0.52,0.579
+has emoji,208,0.366,0.344,0.244,0.325,0.383,0.472
+short (<=10 words),251,0.485,0.444,0.337,0.425,0.471,0.56
+long (>25 words),202,0.294,0.327,0.222,0.348,0.324,0.359
+English code-switching,15,0.35,0.177,0.196,0.217,0.317,0.393
+no emotion (gold),354,0.274,0.322,0.099,0.305,0.345,0.404
+2+ emotions (gold),66,0.527,0.509,0.511,0.568,0.509,0.647
