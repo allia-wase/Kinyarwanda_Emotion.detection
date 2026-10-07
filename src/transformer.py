@@ -10,7 +10,7 @@ emotions better than one that did not?
   T2  AfriBERTa large   (Ogueji et al., 2021)   trained from scratch on 11 African languages incl. Kinyarwanda
   T3  AfroXLMR base     (Alabi et al., 2022)    XLM-R base + continued pretraining on 17 African languages incl. Kinyarwanda
   T4  AfroXLMR large                            as T3, 2x deeper/wider: does scale help with 2.4k examples?
-  T5  AfroXLMR base + LoRA (Hu et al., 2022)    only ~1% of weights trained: does parameter-efficient tuning keep up?
+  T5  AfroXLMR base + LoRA (Hu et al., 2022)    only ~0.4% of weights trained: does parameter-efficient tuning keep up?
 
 T1 vs T3 is the controlled comparison: identical architecture and tokenizer,
 the only difference is the extra African-language pretraining.

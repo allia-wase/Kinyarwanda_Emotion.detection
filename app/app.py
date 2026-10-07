@@ -87,7 +87,7 @@ with gr.Blocks(title="Amarangamutima: Kinyarwanda emotion detection") as demo:
         "**Kinyarwanda emotion detection.** Write a sentence in Kinyarwanda and the model "
         "detects which emotions it expresses: anger, disgust, fear, joy, sadness, surprise "
         "(several, or none).\n\n"
-        "Model: AfroXLMR-base fine-tuned on the Kinyarwanda part of the BRIGHTER dataset "
+        "Model: AfroXLMR-large fine-tuned on the Kinyarwanda part of the BRIGHTER dataset "
         "(SemEval-2025 Task 11). [Code and report on GitHub]"
         "(https://github.com/allia-wase/Kinyarwanda_Emotion.detection)")
     with gr.Row():
