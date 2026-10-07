@@ -1,5 +1,9 @@
+# Web app (Streamlit Community Cloud). CPU-only torch keeps the install small.
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch
 transformers>=4.44
 sentencepiece
 protobuf
-gradio>=4.40
+numpy
+pandas
+streamlit>=1.36
