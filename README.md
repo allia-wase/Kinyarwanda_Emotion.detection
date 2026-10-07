@@ -57,7 +57,7 @@ Test set, 1,231 texts. Neural models: mean ± std over 3 seeds. Model selection 
 | L3 | BiLSTM, Word2Vec (fine-tuned) | 0.511 | 0.478 ± 0.007 | |
 | L4 | BiLSTM, Word2Vec + attention pooling | 0.516 | 0.458 ± 0.009 | |
 | T1 | XLM-R base (no Kinyarwanda in pretraining) | 0.395 | 0.363 ± 0.050 | 0.353 |
-| T2 | AfriBERTa large | 0.545 | 0.508 ± 0.004 | |
+| T2 | AfriBERTa large | 0.545 | 0.508 ± 0.006 | |
 | T3 | AfroXLMR base | 0.585 | 0.538 ± 0.003 | 0.569 |
 | T5 | AfroXLMR base + LoRA (0.4% of weights trained) | 0.588 | 0.525 ± 0.018 | 0.558 |
 | **T4** | **AfroXLMR large** | **0.614** | **0.592 ± 0.006** | |
@@ -109,7 +109,9 @@ src/
 app/
   streamlit_app.py   web app
 notebooks/
-  02_transformers_colab.ipynb   runs group 3 on Google Colab
+  01_data_exploration.ipynb           dataset, duplicates, label distribution, text profile
+  02_transformers_colab.ipynb         runs experiment group 3 on Google Colab (GPU)
+  03_results_and_error_analysis.ipynb all results, comparisons, per-emotion and error analysis
 results/
   experiments.csv               one row per experiment (the results table)
   <experiment>/errors.csv       every misclassified test text

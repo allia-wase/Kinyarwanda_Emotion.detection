@@ -5,3 +5,4 @@ data/raw/
 data/external/
 models/
 *.zip
+data/test_probs_*.npy
