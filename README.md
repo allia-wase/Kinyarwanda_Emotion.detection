@@ -176,4 +176,3 @@ Experiment B0 (random baseline) is computed inside `src.baseline` and appears on
 - Paszke, A., et al. (2019). PyTorch: An imperative style, high-performance deep learning library. *NeurIPS 2019*.
 - Pedregosa, F., et al. (2011). Scikit-learn: Machine learning in Python. *JMLR, 12*, 2825-2830.
 - Wolf, T., et al. (2020). Transformers: State-of-the-art natural language processing. *EMNLP 2020 (System Demonstrations)*.
-- Streamlit: [ADD year and URL].
