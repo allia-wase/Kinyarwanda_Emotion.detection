@@ -4,20 +4,20 @@ Multi-label emotion classification for Kinyarwanda: given a short text, predict 
 
 | Resource | Link |
 |---|---|
-| Live web app | _coming soon_ (Streamlit Community Cloud) |
+| Live web app | https://amarangamutima.streamlit.app/ (Streamlit Community Cloud) |
 | Fine-tuned model | [Alliane/kinyarwanda-emotion-afroxlmr](https://huggingface.co/Alliane/kinyarwanda-emotion-afroxlmr) |
-| Demo video | _coming soon_ |
-| Report (PDF) | _coming soon_ |
+| Demo video | [Watch the demo](https://drive.google.com/file/d/1JNAzwkJemRTTYDx2YGgvMfJqGjiwcxDo/view?usp=drive_link) |
+| Report (PDF) | [ADD LINK]https://docs.google.com/document/d/15ZocZ3vajSpmK409vX-1OPnEzK5Lpa8QlCCIwYl9k74/edit?usp=sharing |
 
-**Best model:** AfroXLMR-large fine-tuned on 2,451 Kinyarwanda texts: **test macro-F1 0.592 ± 0.006** (3 seeds), against 0.511 for the TF-IDF baseline and 0.363 for XLM-R, which never saw Kinyarwanda in pretraining.
+**Best model:** AfroXLMR-large fine-tuned on 2,451 Kinyarwanda texts: **test macro-F1 0.592 ± 0.006** (3 seeds), against 0.511 for the best TF-IDF baseline and 0.363 for XLM-R, which never saw Kinyarwanda in pretraining. This is level with the best Kinyarwanda system in SemEval-2025 Task 11 (0.590; Muhammad et al., 2025b). The comparison is only indicative, because the shared-task systems were built and tuned under different conditions.
 
 ## Problem and motivation
 
-Kinyarwanda, the national language of Rwanda, has very few NLP tools. An emotion detector is a building block for a Kinyarwanda-language wellbeing check-in tool for students. For example, it could surface sadness or fear in what someone writes and suggest support resources. **It is a support aid, not a diagnostic tool.**
+Kinyarwanda, the national language of Rwanda, has very few NLP tools. An emotion detector is a building block for a Kinyarwanda-language wellbeing check-in tool for students. For example, it could surface sadness or fear in what someone writes and suggest support resources. **It is a support aid, not a diagnostic tool, and must not be used to make decisions about anyone's mental health.**
 
 ## Dataset
 
-[BRIGHTER](https://huggingface.co/datasets/brighter-dataset/BRIGHTER-emotion-categories), Kinyarwanda (`kin`) subset (Muhammad et al., 2025; SemEval-2025 Task 11, Track A). Licence: CC-BY-4.0. Texts were annotated by native speakers.
+[BRIGHTER](https://huggingface.co/datasets/brighter-dataset/BRIGHTER-emotion-categories), Kinyarwanda (`kin`) subset (Muhammad et al., 2025a; SemEval-2025 Task 11, Track A). Licence: CC-BY-4.0. Texts were annotated by native speakers. No synthetic or machine-generated training data is used.
 
 | Split | Rows on Hugging Face | Unique texts used |
 |---|---|---|
@@ -25,25 +25,25 @@ Kinyarwanda, the national language of Rwanda, has very few NLP tools. An emotion
 | dev | 814 | 407 |
 | test | 2,462 | 1,231 |
 
-**Data-quality finding:** the Hugging Face release lists every dev/test text twice (once under a Track A id, once under a Track C id) with identical labels. Copies are removed so no test text is counted twice (`src/data.py`).
+**Data-quality finding:** the Hugging Face release lists every dev/test text twice (once under a Track A id, once under a Track C id) with identical labels. Copies are removed so no test text is counted twice (`src/data.py`). The official split is kept so results stay comparable with SemEval-2025 Task 11.
 
 Label distribution (train): sadness 26%, anger 18%, joy 17%, fear 6%, disgust 5%, surprise 4%; 29% of texts carry no emotion and 5% carry two or more.
 
-Unlabelled text for Word2Vec: the [KINNEWS](https://github.com/Andrews2017/KINNEWS-and-KIRNEWS-Corpus) news corpus (Niyongabo et al., 2020), 11,089 articles, ~4.4M tokens. Any article containing a dev/test sentence is removed first.
+Unlabelled text for Word2Vec: the [KINNEWS](https://github.com/Andrews2017/KINNEWS-and-KIRNEWS-Corpus) news corpus (Niyongabo et al., 2020), 11,089 articles, ~4.4M tokens, used without its labels. Any article containing a dev/test sentence is removed first.
 
 ## Approach
 
 | Group | Models | Script |
 |---|---|---|
 | Baselines | random (by label frequency); TF-IDF (word / character n-grams) + one-vs-rest logistic regression | `src/baseline.py` |
-| Neural | Word2Vec (skip-gram with negative sampling, implemented in PyTorch) → BiLSTM with max or attention pooling | `src/word2vec.py`, `src/bilstm.py` |
+| Neural | Word2Vec (skip-gram with negative sampling, implemented in PyTorch) → BiLSTM (Hochreiter & Schmidhuber, 1997) with max or attention (Bahdanau et al., 2015) pooling | `src/word2vec.py`, `src/bilstm.py` |
 | Transformers | XLM-R base, AfriBERTa large, AfroXLMR base/large (full fine-tuning), AfroXLMR base + LoRA | `src/transformer.py` |
 
-Main metric: **macro-F1 over the six emotions** (the official SemEval-2025 Task 11 metric). Each emotion's decision threshold is tuned on dev. Neural models are run with 3 seeds and reported as mean ± std.
+Main metric: **macro-F1 over the six emotions** (the official SemEval-2025 Task 11 metric). Each emotion's decision threshold is tuned on dev. Training uses binary cross-entropy with positive examples weighted by √(negatives / positives). Neural models are run with 3 seeds and reported as mean ± std. Model selection uses the dev set only.
 
 ## Results
 
-Test set, 1,231 texts. Neural models: mean ± std over 3 seeds. Model selection uses **dev** only.
+Test set, 1,231 texts. Neural models: mean ± std over 3 seeds. B1 to B4 are deterministic.
 
 | Exp | Model | Dev macro-F1 | Test macro-F1 | Test micro-F1 |
 |---|---|---|---|---|
@@ -52,30 +52,32 @@ Test set, 1,231 texts. Neural models: mean ± std over 3 seeds. Model selection 
 | B2 | + class weights + tuned thresholds | 0.486 | 0.466 | 0.492 |
 | B3 | Character TF-IDF + LogReg (tuned) | 0.524 | 0.504 | 0.513 |
 | B4 | Word + character TF-IDF + LogReg (tuned) | 0.534 | 0.511 | 0.509 |
-| L1 | BiLSTM, random embeddings | 0.452 | 0.413 ± 0.008 | |
-| L2 | BiLSTM, Word2Vec (frozen) | 0.518 | 0.465 ± 0.003 | |
-| L3 | BiLSTM, Word2Vec (fine-tuned) | 0.511 | 0.478 ± 0.007 | |
-| L4 | BiLSTM, Word2Vec + attention pooling | 0.516 | 0.458 ± 0.009 | |
+| L1 | BiLSTM, random embeddings | 0.452 | 0.413 ± 0.008 | 0.442 |
+| L2 | BiLSTM, Word2Vec (frozen) | 0.518 | 0.465 ± 0.003 | 0.486 |
+| L3 | BiLSTM, Word2Vec (fine-tuned) | 0.511 | 0.478 ± 0.007 | 0.488 |
+| L4 | BiLSTM, Word2Vec + attention pooling | 0.516 | 0.458 ± 0.009 | 0.495 |
 | T1 | XLM-R base (no Kinyarwanda in pretraining) | 0.395 | 0.363 ± 0.050 | 0.353 |
-| T2 | AfriBERTa large | 0.545 | 0.508 ± 0.006 | |
 | T3 | AfroXLMR base | 0.585 | 0.538 ± 0.003 | 0.569 |
+| T2 | AfriBERTa large | 0.545 | 0.508 ± 0.006 | 0.534 |
 | T5 | AfroXLMR base + LoRA (0.4% of weights trained) | 0.588 | 0.525 ± 0.018 | 0.558 |
-| **T4** | **AfroXLMR large** | **0.614** | **0.592 ± 0.006** | |
+| **T4** | **AfroXLMR large** | **0.614** | **0.592 ± 0.006** | **0.638** |
 
 Full table with every metric and configuration: [`results/experiments.csv`](results/experiments.csv).
 
 **What we learned**
 1. **Handling imbalance is the biggest single win** (B1 → B2: +0.26). With a 0.5 threshold, fear and surprise are never predicted.
-2. **Seeing Kinyarwanda in pretraining matters most.** XLM-R and AfroXLMR-base share architecture and tokenizer. AfroXLMR's extra African-language pretraining is worth +0.17 macro-F1, and XLM-R was also unstable (one seed collapsed after epoch 1).
-3. **More complex is not automatically better.** The BiLSTM never beats TF-IDF on 2.4k texts. Pretrained Word2Vec helps it (+0.065, test OOV 24.6% → 9.4%), attention pooling does not.
-4. **Scale still helps with little data:** AfroXLMR-large beats base by +0.05, on all three seeds.
-5. **LoRA** keeps ~98% of full fine-tuning's score while training 0.4% of the weights, about 3× faster, but varies more across seeds.
+2. **Seeing Kinyarwanda in pretraining matters most.** XLM-R and AfroXLMR-base share architecture and tokenizer. AfroXLMR's extra African-language pretraining is worth +0.175 macro-F1 (0.363 → 0.538). XLM-R was also unstable (one seed collapsed after epoch 1), so part of the gap may reflect fine-tuning instability.
+3. **More complex is not automatically better.** The BiLSTM never beats TF-IDF on 2.4k texts. Pretrained Word2Vec helps it (+0.065), possibly through vocabulary coverage (test OOV 24.6% → 9.4%). Attention pooling does not help (a hypothesis: it overfits).
+4. **Scale still helps with little data:** AfroXLMR-large beats base by +0.054, on all three seeds, at about 3× the training time (12.1 vs 4.4 minutes per run).
+5. **LoRA** keeps ~98% of full fine-tuning's score while training 0.4% of the weights, in 1.6 instead of 4.4 minutes per run, but varies more across seeds.
 
 ## Error analysis
 
 `python -m src.error_analysis` → [`results/error_analysis/`](results/error_analysis/)
 
-| Emotion (test F1) | TF-IDF | BiLSTM | XLM-R | AfriBERTa | AfroXLMR-base | AfroXLMR-large |
+Per-emotion test F1 (best-dev seed of each model, so values differ slightly from the seed means above):
+
+| Emotion | TF-IDF | BiLSTM | XLM-R | AfriBERTa | AfroXLMR-base | AfroXLMR-large |
 |---|---|---|---|---|---|---|
 | anger | 0.49 | 0.46 | 0.47 | 0.52 | 0.55 | **0.58** |
 | disgust | 0.85 | 0.77 | 0.71 | **0.87** | 0.83 | 0.85 |
@@ -85,11 +87,29 @@ Full table with every metric and configuration: [`results/experiments.csv`](resu
 | surprise | 0.17 | 0.18 | 0.11 | 0.11 | 0.13 | **0.24** |
 
 - **Missed emotions are the most common error**: an emotional text is predicted as "none". Sadness and anger are confused in both directions; they also co-occur most in the training labels.
-- **Disgust is easy for a dataset reason**: disgust texts average 7 words (vs ~18), are almost never tweets, and use distinctive vocabulary (*umwanda*, *isesemi*, *umunuko*), a shortcut the models exploit.
+- **Disgust is easy, probably for a dataset reason**: disgust texts average 7 words (vs ~18), are almost never tweets, and use distinctive vocabulary (*umwanda*, *isesemi*, *umunuko*). This is a likely shortcut: character TF-IDF is the best disgust model on the seed means.
 - **Surprise is the hardest emotion** (≤ 0.24): only 105 training examples, and it depends on what the reader expected rather than on specific words.
-- **Tweets are harder than news-style sentences** (AfroXLMR-large: 0.39 vs 0.58). Jokes with 😂 and "?" are often predicted as anger, the same shortcut the TF-IDF model's top anger features reveal.
+- **Tweets are harder than news-style sentences** (AfroXLMR-large: 0.39 vs 0.58). Here "tweet" means a text containing an @mention, a proxy rather than a verified source label. Jokes with 😂 and "?" are often predicted as anger, the same pattern the TF-IDF model's top anger features reveal.
 - XLM-R without Kinyarwanda **floods rare classes**: it predicted fear 508 times for 72 true cases.
-- 268 test texts are wrong for all six analysed models. 21 of them were reviewed by a native speaker ([`native_speaker_review.csv`](results/error_analysis/native_speaker_review.csv)): debatable labels, sarcasm, idioms (*kwica inyoni ebyiri n'ibuye rimwe*), missing context.
+- 268 test texts are wrong for all six analysed models. 21 of them were reviewed by one native speaker ([`native_speaker_review.csv`](results/error_analysis/native_speaker_review.csv)): [ADD COUNTS: debatable labels / sarcasm / missing context / slang / clear model error], with idioms such as *kwica inyoni ebyiri n'ibuye rimwe* as examples.
+
+## Web app
+
+The app (`app/streamlit_app.py`) runs the fine-tuned AfroXLMR-large model from the Hugging Face Hub. The user types Kinyarwanda text or picks an example and sees the detected emotions (Kinyarwanda and English names), a probability bar next to each emotion's threshold, and the sub-word tokens the model received. It uses the same `normalize` and inference code (`src/inference.py`) as the evaluation. To fit the free tier's memory limit, the model is loaded in bfloat16. 
+
+The free Streamlit tier puts the app to sleep when it is unused. If it is asleep, wait one to two minutes for it to wake and load the model, or watch the demo video. To run it locally: `streamlit run app/streamlit_app.py`.
+
+## Existing resources and my own work
+
+| Used as-is (existing resources) | Implemented in this project |
+|---|---|
+| BRIGHTER Kinyarwanda data (labels, splits) | De-duplicated dev/test rows; text normalisation; all analyses of the data |
+| KINNEWS articles (text only) | Leakage filter; Word2Vec (skip-gram with negative sampling) written in PyTorch |
+| Pretrained checkpoints: XLM-R, AfriBERTa, AfroXLMR | Fine-tuning loop, loss weighting, threshold tuning, LoRA setup, multi-seed runs |
+| Libraries: PyTorch, Hugging Face Transformers, Datasets and PEFT, scikit-learn, Streamlit | BiLSTM with max and attention pooling; TF-IDF experiments |
+| Google Colab (GPU), Streamlit Community Cloud, Hugging Face Hub (hosting) | Evaluation and error-analysis code, native-speaker review, web application |
+
+The Transformer classification head (dense, tanh, linear) is the one built into Hugging Face's `AutoModelForSequenceClassification`.
 
 ## Repository layout
 
@@ -121,11 +141,13 @@ results/
 
 ## Reproduce
 
+Python 3.18 . The Transformer experiments need a GPU (a Colab T4 was used).
+
 ```bash
 pip install -r requirements.txt
 python -m src.data          # data/processed/{train,dev,test}.csv
 python -m src.baseline      # ~30 s
-python -m src.word2vec      # ~35 min on CPU
+python -m src.word2vec      # ~35 min on CPU; needs the KINNEWS text [ADD where to download it and where to place it]
 python -m src.bilstm        # ~1 h on CPU
 python -m src.transformer   # GPU; or open notebooks/02_transformers_colab.ipynb in Colab
 python -m src.error_analysis
@@ -133,13 +155,25 @@ python -m src.predict "ndumva mfite agahinda kenshi uyu munsi"   # uses the publ
 streamlit run app/streamlit_app.py                                # the web app, locally
 ```
 
+Experiment B0 (random baseline) is computed inside `src.baseline` and appears only as a row in `results/experiments.csv`. [CONFIRM]
+
+
 ## References
 
 - Alabi, J. O., Adelani, D. I., Mosbach, M., & Klakow, D. (2022). Adapting pre-trained language models to African languages via multilingual adaptive fine-tuning. *COLING 2022*.
+- Bahdanau, D., Cho, K., & Bengio, Y. (2015). Neural machine translation by jointly learning to align and translate. *ICLR 2015*.
 - Conneau, A., et al. (2020). Unsupervised cross-lingual representation learning at scale. *ACL 2020*.
+- Hochreiter, S., & Schmidhuber, J. (1997). Long short-term memory. *Neural Computation, 9*(8), 1735-1780.
 - Hu, E. J., et al. (2022). LoRA: Low-rank adaptation of large language models. *ICLR 2022*.
+- Lhoest, Q., et al. (2021). Datasets: A community library for natural language processing. *EMNLP 2021 (System Demonstrations)*.
+- Mangrulkar, S., et al. (2022). PEFT: State-of-the-art parameter-efficient fine-tuning methods. https://github.com/huggingface/peft
 - Mikolov, T., Sutskever, I., Chen, K., Corrado, G., & Dean, J. (2013). Distributed representations of words and phrases and their compositionality. *NeurIPS 2013*.
 - Mosbach, M., Andriushchenko, M., & Klakow, D. (2021). On the stability of fine-tuning BERT: Misconceptions, explanations, and strong baselines. *ICLR 2021*.
-- Muhammad, S. H., et al. (2025). BRIGHTER: BRIdging the gap in human-annotated textual emotion recognition datasets for 28 languages. *ACL 2025*.
+- Muhammad, S. H., et al. (2025a). BRIGHTER: BRIdging the gap in human-annotated textual emotion recognition datasets for 28 languages. *ACL 2025*.
+- Muhammad, S. H., et al. (2025b). SemEval-2025 Task 11: Bridging the gap in text-based emotion detection. *SemEval-2025*. https://aclanthology.org/2025.semeval-1.327/
 - Niyongabo, R. A., Qu, H., Kreutzer, J., & Huang, L. (2020). KINNEWS and KIRNEWS: Benchmarking cross-lingual text classification for Kinyarwanda and Kirundi. *COLING 2020*.
 - Ogueji, K., Zhu, Y., & Lin, J. (2021). Small data? No problem! Exploring the viability of pretrained multilingual language models for low-resourced languages. *MRL Workshop, EMNLP 2021*.
+- Paszke, A., et al. (2019). PyTorch: An imperative style, high-performance deep learning library. *NeurIPS 2019*.
+- Pedregosa, F., et al. (2011). Scikit-learn: Machine learning in Python. *JMLR, 12*, 2825-2830.
+- Wolf, T., et al. (2020). Transformers: State-of-the-art natural language processing. *EMNLP 2020 (System Demonstrations)*.
+- Streamlit: [ADD year and URL].
