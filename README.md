@@ -7,7 +7,7 @@ Multi-label emotion classification for Kinyarwanda: given a short text, predict 
 | Live web app | https://amarangamutima.streamlit.app/ (Streamlit Community Cloud) |
 | Fine-tuned model | [Alliane/kinyarwanda-emotion-afroxlmr](https://huggingface.co/Alliane/kinyarwanda-emotion-afroxlmr) |
 | Demo video | [Watch the demo](https://drive.google.com/file/d/1JNAzwkJemRTTYDx2YGgvMfJqGjiwcxDo/view?usp=drive_link) |
-| Report (PDF) | [ADD LINK]https://docs.google.com/document/d/15ZocZ3vajSpmK409vX-1OPnEzK5Lpa8QlCCIwYl9k74/edit?usp=sharing |
+| Report (PDF) | https://docs.google.com/document/d/15ZocZ3vajSpmK409vX-1OPnEzK5Lpa8QlCCIwYl9k74/edit?usp=sharing |
 
 **Best model:** AfroXLMR-large fine-tuned on 2,451 Kinyarwanda texts: **test macro-F1 0.592 ± 0.006** (3 seeds), against 0.511 for the best TF-IDF baseline and 0.363 for XLM-R, which never saw Kinyarwanda in pretraining. This is level with the best Kinyarwanda system in SemEval-2025 Task 11 (0.590; Muhammad et al., 2025b). The comparison is only indicative, because the shared-task systems were built and tuned under different conditions.
 
